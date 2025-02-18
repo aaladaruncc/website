@@ -3,19 +3,88 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a1916;
+  --foreground: #e4fffa;
+  --muted: #64918c;
+  --border: rgba(100, 255, 218, 0.08);
+  --hover: rgba(100, 255, 218, 0.03);
+  --accent: #64ffda;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a1916;
+    --foreground: #e4fffa;
+    --muted: #64918c;
+    --border: rgba(100, 255, 218, 0.08);
+    --hover: rgba(100, 255, 218, 0.03);
+    --accent: #64ffda;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-image: 
+    radial-gradient(at 40% 20%, rgba(100, 255, 218, 0.03) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(100, 255, 218, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(100, 255, 218, 0.02) 0px, transparent 50%);
+  font-family: var(--font-geist-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+/* === Featured Works Component Styles === */
+
+.featured-works-container {
+  @apply mt-8 mb-12 px-4;
+}
+
+.section-header {
+  @apply mb-4;
+}
+
+.section-title {
+  @apply text-2xl font-bold;
+}
+
+.section-subtitle {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.work-entry {
+  @apply mb-12 pb-8 border-b border-gray-200 dark:border-gray-700;
+}
+
+.work-header {
+  @apply flex flex-wrap items-center justify-between mb-4;
+}
+
+.work-title h3 {
+  @apply font-semibold m-0 text-xl;
+}
+
+.work-dates {
+  @apply text-sm text-gray-400;
+}
+
+.work-content {
+  /* Two-column layout on medium screens and up, single column on smaller screens. */
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.work-initiatives h4,
+.work-publications h4 {
+  @apply font-semibold;
+}
+
+.work-initiatives li,
+.work-publications li {
+  @apply mb-3;
+}
+
+/* Subtle blur effect for floating elements */
+.glass-blur {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+ 
