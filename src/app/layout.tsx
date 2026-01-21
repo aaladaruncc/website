@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Cabin } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 
-const inter = Inter({
+const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-bricolage",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const cabin = Cabin({
   subsets: ["latin"],
-  variable: "--font-space",
+  variable: "--font-cabin",
 });
 export const metadata: Metadata = {
   title: "Aryan Aladar",
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${bricolageGrotesque.variable} ${cabin.variable}`}>
       <body>
         {children}
         <Analytics />

@@ -14,6 +14,8 @@ export default {
         muted: "var(--muted)",
         border: "var(--border)",
         hover: "var(--hover)",
+        accent: "var(--accent)",
+        "accent-2": "var(--accent-2)",
       },
     },
   },

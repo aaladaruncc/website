@@ -3,22 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a1916;
-  --foreground: #e4fffa;
-  --muted: #64918c;
-  --border: rgba(100, 255, 218, 0.08);
-  --hover: rgba(100, 255, 218, 0.03);
-  --accent: #64ffda;
+  --background: #0b0e0f;
+  --foreground: #f7f3ee;
+  --muted: #b6a99c;
+  --border: rgba(247, 243, 238, 0.12);
+  --hover: rgba(247, 243, 238, 0.06);
+  --accent: #ffb36b;
+  --accent-2: #64f2d6;
+  --font-display: var(--font-bricolage);
+  --font-body: var(--font-cabin);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a1916;
-    --foreground: #e4fffa;
-    --muted: #64918c;
-    --border: rgba(100, 255, 218, 0.08);
-    --hover: rgba(100, 255, 218, 0.03);
-    --accent: #64ffda;
+    --background: #0b0e0f;
+    --foreground: #f7f3ee;
+    --muted: #b6a99c;
+    --border: rgba(247, 243, 238, 0.12);
+    --hover: rgba(247, 243, 238, 0.06);
+    --accent: #ffb36b;
+    --accent-2: #64f2d6;
+    --font-display: var(--font-bricolage);
+    --font-body: var(--font-cabin);
   }
 }
 
@@ -26,65 +32,18 @@ body {
   color: var(--foreground);
   background: var(--background);
   background-image: 
-    radial-gradient(at 40% 20%, rgba(100, 255, 218, 0.03) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(100, 255, 218, 0.05) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, rgba(100, 255, 218, 0.02) 0px, transparent 50%);
-  font-family: var(--font-geist-sans);
+    radial-gradient(at 20% 10%, rgba(255, 179, 107, 0.18) 0px, transparent 55%),
+    radial-gradient(at 80% 20%, rgba(100, 242, 214, 0.14) 0px, transparent 60%),
+    radial-gradient(at 50% 90%, rgba(255, 179, 107, 0.12) 0px, transparent 50%);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
-/* === Featured Works Component Styles === */
-
-.featured-works-container {
-  @apply mt-8 mb-12 px-4;
+@layer base {
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
 }
 
-.section-header {
-  @apply mb-4;
-}
-
-.section-title {
-  @apply text-2xl font-bold;
-}
-
-.section-subtitle {
-  @apply text-sm text-gray-500 dark:text-gray-400;
-}
-
-.work-entry {
-  @apply mb-12 pb-8 border-b border-gray-200 dark:border-gray-700;
-}
-
-.work-header {
-  @apply flex flex-wrap items-center justify-between mb-4;
-}
-
-.work-title h3 {
-  @apply font-semibold m-0 text-xl;
-}
-
-.work-dates {
-  @apply text-sm text-gray-400;
-}
-
-.work-content {
-  /* Two-column layout on medium screens and up, single column on smaller screens. */
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-}
-
-.work-initiatives h4,
-.work-publications h4 {
-  @apply font-semibold;
-}
-
-.work-initiatives li,
-.work-publications li {
-  @apply mb-3;
-}
-
-/* Subtle blur effect for floating elements */
-.glass-blur {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
  
