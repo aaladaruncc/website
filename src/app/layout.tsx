@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Cabin } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 
-const bricolageGrotesque = Bricolage_Grotesque({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
-  variable: "--font-bricolage",
 });
 
-const cabin = Cabin({
-  subsets: ["latin"],
-  variable: "--font-cabin",
-});
 export const metadata: Metadata = {
   title: "Aryan Aladar",
-  description: "Student, Founder & Researcher at UNC Chapel Hill. Passionate about technology, AI/ML, and community impact.",
+  description: "Student, Founder & Researcher at UNC Chapel Hill.",
 };
 
 export default function RootLayout({
@@ -23,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${bricolageGrotesque.variable} ${cabin.variable}`}>
-      <body>
+    <html lang="en">
+      <body className={sourceSans.className}>
         {children}
         <Analytics />
       </body>

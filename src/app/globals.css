@@ -3,47 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0e0f;
-  --foreground: #f7f3ee;
-  --muted: #b6a99c;
-  --border: rgba(247, 243, 238, 0.12);
-  --hover: rgba(247, 243, 238, 0.06);
-  --accent: #ffb36b;
-  --accent-2: #64f2d6;
-  --font-display: var(--font-bricolage);
-  --font-body: var(--font-cabin);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0e0f;
-    --foreground: #f7f3ee;
-    --muted: #b6a99c;
-    --border: rgba(247, 243, 238, 0.12);
-    --hover: rgba(247, 243, 238, 0.06);
-    --accent: #ffb36b;
-    --accent-2: #64f2d6;
-    --font-display: var(--font-bricolage);
-    --font-body: var(--font-cabin);
-  }
+  --background: #ffffff;
+  --foreground: #111111;
+  --muted: #555555;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  background-image: 
-    radial-gradient(at 20% 10%, rgba(255, 179, 107, 0.18) 0px, transparent 55%),
-    radial-gradient(at 80% 20%, rgba(100, 242, 214, 0.14) 0px, transparent 60%),
-    radial-gradient(at 50% 90%, rgba(255, 179, 107, 0.12) 0px, transparent 50%);
-  font-family: var(--font-body);
+  font-family: inherit;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.7;
+  min-height: 100vh;
 }
 
-@layer base {
-  .font-display {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+@layer utilities {
+  .container-minimal {
+    @apply max-w-[680px] mx-auto px-6 py-16 md:py-20;
   }
 }
-
- 

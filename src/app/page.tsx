@@ -1,284 +1,203 @@
 'use client'
-import Image from "next/image";
-import { MainLayout } from "@/components/layout/MainLayout";
-import { motion } from "framer-motion";
-const builtLinks = [
-  {
-    label: "Ocal AI",
-    description: "AI calendar for students.",
-    href: "https://ocal.ai",
-    past: true,
-  },
-  {
-    label: "Edukona",
-    description: "Research-backed quiz generation platform.",
-    href: "https://edukona.com",
-    past: true,
-  },
-  {
-    label: "Workbooks",
-    description: "Flashcards and annotation tool.",
-    href: "#",
-    past: true,
-  },
-];
 
-const experiences = [
-  {
-    company: "Carolina Investment Group",
-    role: "Quantitative Trader",
-    period: "Sep 2024 - Present",
-    summary:
-      "Student-run hedge fund trader focused on systematic strategies and alternative data.",
-    highlights: [
-      "Built long/short and pairs strategies using covariance and z-score signals.",
-      "Expanded alpha using Quiver Quant and custom factor research.",
-      "Optimized portfolio risk with Sharpe, Sortino, and VaR analysis.",
-    ],
-  },
-  {
-    company: "Fidelity Investments",
-    role: "Software Engineering Intern, AI/ML",
-    period: "Jun 2024 - Aug 2024",
-    summary:
-      "Improved compliance workflows using NLP for asset management and rule mapping.",
-    highlights: [
-      "Fine-tuned SpaCy and DistilBERT for NER and span classification.",
-      "Mapped rule language across 6,000 compliance rules.",
-      "Built an MLOps pipeline for model deployment and retraining.",
-    ],
-  },
-  {
-    company: "UNC Charlotte",
-    role: "Lead Researcher",
-    period: "Sep 2023 - May 2024",
-    summary:
-      "Published research and shipped a quiz platform with real-time collaboration.",
-    highlights: [
-      "Published at Frontiers in Education (FIE) 2024.",
-      "Built WebSocket-driven quiz sessions and boosted responsiveness by 34%.",
-      "Streamlined AWS deployment and CI/CD for lab tooling.",
-    ],
-  },
-];
+import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
+import { useMemo, useRef } from 'react'
 
-const focusAreas = [
-  {
-    title: "Human-centered AI",
-    description:
-      "Building AI tools that feel personal, focused, and genuinely helpful to students.",
-  },
-  {
-    title: "Research to product",
-    description:
-      "Translating lab ideas into prototypes that can ship in the real world.",
-  },
-  {
-    title: "Community impact",
-    description:
-      "Bringing automation and AI knowledge to communities that are often left out.",
-  },
-];
+const COLORS = {
+  carbon: '#2f2f2f',
+  oxygen: '#e84b4b',
+  nitrogen: '#3b6cff',
+  hydrogen: '#f5f5f5',
+}
+
+type AtomType = 'carbon' | 'oxygen' | 'nitrogen' | 'hydrogen'
+
+type Atom = {
+  id: string
+  type: AtomType
+  position: [number, number, number]
+  size: number
+}
+
+type Bond = {
+  id: string
+  start: [number, number, number]
+  end: [number, number, number]
+  radius?: number
+}
+
+function AtomMesh({ atom }: { atom: Atom }) {
+  const materialProps =
+    atom.type === 'oxygen'
+      ? { emissive: '#ff7b7b', emissiveIntensity: 0.35 }
+      : atom.type === 'nitrogen'
+        ? { emissive: '#7aa2ff', emissiveIntensity: 0.3 }
+        : atom.type === 'hydrogen'
+          ? { emissive: '#ffffff', emissiveIntensity: 0.12 }
+          : { emissive: '#111111', emissiveIntensity: 0.08 }
+
+  return (
+    <mesh position={atom.position}>
+      <sphereGeometry args={[atom.size, 32, 32]} />
+      <meshPhysicalMaterial
+        color={COLORS[atom.type]}
+        roughness={0.18}
+        metalness={0.12}
+        clearcoat={0.6}
+        clearcoatRoughness={0.2}
+        {...materialProps}
+      />
+    </mesh>
+  )
+}
+
+function BondMesh({ bond }: { bond: Bond }) {
+  const { position, quaternion, length } = useMemo(() => {
+    const start = new THREE.Vector3(...bond.start)
+    const end = new THREE.Vector3(...bond.end)
+    const mid = start.clone().add(end).multiplyScalar(0.5)
+    const dir = end.clone().sub(start)
+    const len = dir.length()
+    const quaternion = new THREE.Quaternion()
+    quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize())
+    return { position: mid, quaternion, length: len }
+  }, [bond.end, bond.start])
+
+  return (
+    <mesh position={position} quaternion={quaternion}>
+      <cylinderGeometry args={[bond.radius ?? 0.06, bond.radius ?? 0.06, length, 20]} />
+      <meshStandardMaterial color="#8a8f98" roughness={0.45} metalness={0.15} />
+    </mesh>
+  )
+}
+
+function DopamineMolecule() {
+  const groupRef = useRef<THREE.Group>(null)
+  const spinAxis = useMemo(() => new THREE.Vector3(0.35, 1, 0.15).normalize(), [])
+
+  useFrame((_, delta) => {
+    if (groupRef.current) {
+      groupRef.current.rotateOnAxis(spinAxis, delta * 0.7)
+    }
+  })
+
+  const { atoms, bonds } = useMemo(() => {
+    const ringRadius = 1.2
+    const ring = Array.from({ length: 6 }).map((_, i) => {
+      const angle = (Math.PI / 3) * i
+      return [Math.cos(angle) * ringRadius, Math.sin(angle) * ringRadius, 0] as [number, number, number]
+    })
+
+    const atoms: Atom[] = ring.map((pos, i) => ({
+      id: `c${i}`,
+      type: 'carbon',
+      position: pos,
+      size: 0.22,
+    }))
+
+    const ch2a: [number, number, number] = [ring[0][0] + 1.05, ring[0][1] + 0.05, 0.2]
+    const ch2b: [number, number, number] = [ch2a[0] + 0.85, ch2a[1] + 0.2, 0.3]
+    const n: [number, number, number] = [ch2b[0] + 0.7, ch2b[1] + 0.1, 0.2]
+
+    const o1: [number, number, number] = [ring[2][0] + 0.1, ring[2][1] + 0.9, 0.35]
+    const o2: [number, number, number] = [ring[3][0] - 0.7, ring[3][1] + 0.7, -0.2]
+
+    atoms.push(
+      { id: 'ch2a', type: 'carbon', position: ch2a, size: 0.2 },
+      { id: 'ch2b', type: 'carbon', position: ch2b, size: 0.2 },
+      { id: 'n', type: 'nitrogen', position: n, size: 0.23 },
+      { id: 'o1', type: 'oxygen', position: o1, size: 0.2 },
+      { id: 'o2', type: 'oxygen', position: o2, size: 0.2 }
+    )
+
+    const bonds: Bond[] = []
+    for (let i = 0; i < 6; i += 1) {
+      bonds.push({
+        id: `bond-ring-${i}`,
+        start: ring[i],
+        end: ring[(i + 1) % 6],
+        radius: 0.05,
+      })
+    }
+
+    bonds.push(
+      { id: 'bond-chain-1', start: ring[0], end: ch2a, radius: 0.05 },
+      { id: 'bond-chain-2', start: ch2a, end: ch2b, radius: 0.05 },
+      { id: 'bond-chain-3', start: ch2b, end: n, radius: 0.05 },
+      { id: 'bond-oh-1', start: ring[2], end: o1, radius: 0.04 },
+      { id: 'bond-oh-2', start: ring[3], end: o2, radius: 0.04 }
+    )
+
+    return { atoms, bonds }
+  }, [])
+
+  return (
+    <group ref={groupRef} scale={0.72} position={[-0.7, 0, -0.3]}>
+      {bonds.map((bond) => (
+        <BondMesh key={bond.id} bond={bond} />
+      ))}
+      {atoms.map((atom) => (
+        <AtomMesh key={atom.id} atom={atom} />
+      ))}
+    </group>
+  )
+}
+
+function DopamineScene() {
+  return (
+    <div className="relative -mt-6 h-[220px] w-full max-w-[240px] overflow-hidden rounded-3xl border border-neutral-200 bg-[radial-gradient(circle_at_top,#ffffff_0%,#f1f1f1_45%,#e7e7e7_100%)] shadow-[0_20px_45px_-35px_rgba(15,23,42,0.6)]">
+      <Canvas camera={{ position: [0.2, 0.1, 9.2], fov: 78 }} dpr={[1, 1.8]}>
+        <color attach="background" args={["#f6f6f6"]} />
+        <ambientLight intensity={0.45} />
+        <directionalLight position={[5, 4, 2]} intensity={0.8} color="#fff4e8" />
+        <pointLight position={[-3, -2, 4]} intensity={0.55} color="#cbd5ff" />
+        <pointLight position={[2.5, -3, -2]} intensity={0.35} color="#ffffff" />
+        <DopamineMolecule />
+        <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
+      </Canvas>
+      <div className="pointer-events-none absolute bottom-3 left-4 text-[10px] font-semibold uppercase tracking-[0.4em] text-neutral-500/80">
+        Dopamine
+      </div>
+    </div>
+  )
+}
 
 export default function Home() {
   return (
-    <MainLayout>
-      <section className="grid gap-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex flex-col gap-8"
-        >
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-accent/30 blur-xl" />
-              <div className="relative w-24 h-24 rounded-full overflow-hidden ring-2 ring-white/20">
-                <Image
-                  src="/aryan_headshot.jpeg"
-                  alt="Aryan Aladar profile photo"
-                  width={120}
-                  height={120}
-                  className="object-cover w-full h-full"
-                  priority
-                />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.35em] text-muted">
-                Student • Founder • Researcher
-              </p>
-              <h1 className="font-display text-4xl sm:text-6xl">
-                Aryan Aladar
-              </h1>
-              <p className="text-lg sm:text-xl text-muted max-w-xl">
-                I build AI-powered learning tools and research-backed products
-                that make education feel effortless.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <a
-              className="rounded-full border border-border px-5 py-2 text-sm text-foreground hover:border-accent hover:text-foreground transition"
-              href="mailto:aryan.aladar@gmail.com"
-            >
-              Email
-            </a>
-            <a
-              className="rounded-full border border-border px-5 py-2 text-sm text-muted hover:border-accent-2 hover:text-foreground transition"
-              href="https://linkedin.com/in/aladar"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>
-            <a
-              className="rounded-full border border-border px-5 py-2 text-sm text-muted hover:border-accent hover:text-foreground transition"
-              href="https://github.com/aaladaruncc"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="grid gap-4 sm:grid-cols-3"
-        >
-          {focusAreas.map((area) => (
-            <div
-              key={area.title}
-              className="rounded-3xl border border-border bg-white/5 p-6 backdrop-blur-sm"
-            >
-              <h2 className="font-display text-lg">{area.title}</h2>
-              <p className="mt-3 text-sm text-muted leading-relaxed">
-                {area.description}
-              </p>
-            </div>
-          ))}
-        </motion.div>
+    <main className="container-minimal">
+      <section className="space-y-6 text-base text-neutral-800">
+        <p className="text-lg font-medium">Aryan Aladar</p>
+        <p>
+          Hey, I’m Aryan. I like making things, going down rabbit holes, and figuring stuff out as I go. Most of my time is spent learning, tinkering, and chasing ideas that seem interesting enough to keep me up at night.
+        </p>
+        <p>
+          I try to keep my days simple: make something, learn something, then write down what surprised me. I’m drawn to ideas that feel a little unfinished — the ones that get better when you keep tugging on the thread.
+        </p>
+        <p>
+          Right now I’m building <a href="https://useswarm.co" target="_blank" rel="noopener noreferrer">useswarm.co</a>.
+        </p>
       </section>
 
-      <section className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="rounded-3xl border border-border bg-white/5 px-6 py-8 backdrop-blur-sm"
-        >
-          <p className="text-xs uppercase tracking-[0.4em] text-muted">
-            Here is what I am building
+      <section className="mt-14 flex flex-col gap-8 text-sm text-neutral-700 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-4">
+          <p>
+            <span className="font-semibold text-neutral-900">Links:</span>{" "}
+            <a href="https://useswarm.co" target="_blank" rel="noopener noreferrer">UseSwarm</a>,{" "}
+            <a href="https://linkedin.com/in/aladar" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <a
-              className="font-display text-2xl sm:text-3xl hover:text-accent transition"
-              href="https://useswarm.co"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              useswarm.co
-            </a>
-            <span className="text-sm text-muted">
-              Platform for focused, high-signal collaboration.
-            </span>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="space-y-4"
-        >
-          <div className="flex flex-col gap-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-muted">
-              Here is what I built
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl">
-              Recent launches and experiments
-            </h2>
-          </div>
-          <div className="grid gap-4">
-            {builtLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="group flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-white/5 px-5 py-4 backdrop-blur-sm transition hover:border-accent"
-              >
-                <div>
-                  <p className="font-display text-lg transition group-hover:text-accent">
-                    {link.label}
-                    {link.past ? " *" : ""}
-                  </p>
-                  <p className="text-sm text-muted">{link.description}</p>
-                </div>
-                <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                  View
-                </span>
-              </a>
-            ))}
-          </div>
-          <p className="text-xs text-muted">
-            * Past projects (some may be taken down).
+          <p>
+            <span className="font-semibold text-neutral-900">Hobbies:</span>{" "}
+            Making things, learning by tinkering, and chasing snow.
           </p>
-        </motion.div>
-      </section>
-
-      <section className="space-y-6">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs uppercase tracking-[0.4em] text-muted">
-            Experience
+          <p>
+            <span className="font-semibold text-neutral-900">Stats:</span>{" "}
+            Mountains Skiied.
           </p>
-          <h2 className="font-display text-3xl sm:text-4xl">
-            Where I have built and shipped
-          </h2>
         </div>
-        <div className="grid gap-6">
-          {experiences.map((experience, index) => (
-            <motion.article
-              key={experience.company}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: index * 0.08 }}
-              className="rounded-3xl border border-border bg-white/5 p-6 backdrop-blur-sm"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-display text-xl">
-                    {experience.company}
-                  </h3>
-                  <p className="text-sm text-muted">{experience.role}</p>
-                </div>
-                <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                  {experience.period}
-                </span>
-              </div>
-              <p className="mt-4 text-sm text-muted leading-relaxed">
-                {experience.summary}
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-                {experience.highlights.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-accent-2" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.article>
-          ))}
-        </div>
+        <DopamineScene />
       </section>
-    </MainLayout>
-  );
+    </main>
+  )
 }
