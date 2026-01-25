@@ -134,7 +134,7 @@ function DopamineMolecule() {
   }, [])
 
   return (
-    <group ref={groupRef} scale={0.72} position={[-0.7, 0, -0.3]}>
+    <group ref={groupRef} scale={0.72} position={[-0.2, 0, -0.2]}>
       {bonds.map((bond) => (
         <BondMesh key={bond.id} bond={bond} />
       ))}
@@ -147,9 +147,12 @@ function DopamineMolecule() {
 
 function DopamineScene() {
   return (
-    <div className="relative -mt-6 h-[220px] w-full max-w-[240px] overflow-hidden rounded-3xl border border-neutral-200 bg-[radial-gradient(circle_at_top,#ffffff_0%,#f1f1f1_45%,#e7e7e7_100%)] shadow-[0_20px_45px_-35px_rgba(15,23,42,0.6)]">
-      <Canvas camera={{ position: [0.2, 0.1, 9.2], fov: 78 }} dpr={[1, 1.8]}>
-        <color attach="background" args={["#f6f6f6"]} />
+    <div className="relative -mt-16 h-[220px] w-full max-w-[240px] overflow-hidden rounded-3xl bg-transparent">
+      <Canvas
+        camera={{ position: [0.2, 0.1, 9.2], fov: 35 }}
+        dpr={[1, 1.8]}
+        gl={{ alpha: true }}
+      >
         <ambientLight intensity={0.45} />
         <directionalLight position={[5, 4, 2]} intensity={0.8} color="#fff4e8" />
         <pointLight position={[-3, -2, 4]} intensity={0.55} color="#cbd5ff" />
@@ -157,9 +160,6 @@ function DopamineScene() {
         <DopamineMolecule />
         <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
       </Canvas>
-      <div className="pointer-events-none absolute bottom-3 left-4 text-[10px] font-semibold uppercase tracking-[0.4em] text-neutral-500/80">
-        Dopamine
-      </div>
     </div>
   )
 }
@@ -173,27 +173,63 @@ export default function Home() {
           Hey, I’m Aryan. I like making things, going down rabbit holes, and figuring stuff out as I go. Most of my time is spent learning, tinkering, and chasing ideas that seem interesting enough to keep me up at night.
         </p>
         <p>
-          I try to keep my days simple: make something, learn something, then write down what surprised me. I’m drawn to ideas that feel a little unfinished — the ones that get better when you keep tugging on the thread.
+          I try to keep my days simple: make something, learn something, then write down what surprised me. I’m drawn to ideas that feel a little unfinished, the ones that get better when you keep tugging on the thread.
         </p>
         <p>
-          Right now I’m building <a href="https://useswarm.co" target="_blank" rel="noopener noreferrer">useswarm.co</a>.
+          Right now I’m building{" "}
+          <a
+            className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+            href="https://useswarm.co"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            useswarm.co
+          </a>
+          .
         </p>
       </section>
 
       <section className="mt-14 flex flex-col gap-8 text-sm text-neutral-700 md:flex-row md:items-start md:justify-between">
         <div className="space-y-4">
-          <p>
-            <span className="font-semibold text-neutral-900">Links:</span>{" "}
-            <a href="https://useswarm.co" target="_blank" rel="noopener noreferrer">UseSwarm</a>,{" "}
-            <a href="https://linkedin.com/in/aladar" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
+          <p className="text-sm text-neutral-700">
+            <a
+              className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+              href="https://linkedin.com/in/aladar"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
+            </a>
+            {" / "}
+            <a
+              className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+              href="https://github.com/aaladaruncc"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+            {" / "}
+            <a
+              className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+              href="/research"
+            >
+              Research
+            </a>
+            {" / "}
+            <a
+              className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+              href="/blog"
+            >
+              Blog
+            </a>
           </p>
           <p>
             <span className="font-semibold text-neutral-900">Hobbies:</span>{" "}
-            Making things, learning by tinkering, and chasing snow.
+            Reading, Skiing, Pickleball, Tennis, Soccer, Spikeball (Used to Play D1), and Guitar.
           </p>
           <p>
-            <span className="font-semibold text-neutral-900">Stats:</span>{" "}
-            Mountains Skiied.
+            <span className="font-semibold text-neutral-900">Mountains Skied:</span> 5
           </p>
         </div>
         <DopamineScene />
