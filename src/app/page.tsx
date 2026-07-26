@@ -223,6 +223,13 @@ export default function Home() {
             >
               Blog
             </a>
+            {" / "}
+            <a
+              className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
+              href="/photos"
+            >
+              Photos
+            </a>
           </p>
           <p>
             <span className="font-semibold text-neutral-900">Hobbies:</span>{" "}
