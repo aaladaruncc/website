@@ -1,0 +1,50 @@
+# Optional: rebuild the photo manifest from a pre-populated inbox artifact,
+# or from R2-listed objects once iCloud auth is handled outside GitHub.
+#
+# Full Apple Photos → R2 sync usually runs on your Mac (rclone needs iCloud 2FA).
+# Use this workflow after uploading a .photos-inbox archive, or extend it with
+# your own secrets once you have a non-interactive rclone config.
+
+name: Sync photos
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 */6 * * *"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sync inbox → R2 + manifest
+        if: ${{ secrets.R2_ACCOUNT_ID != '' }}
+        env:
+          PHOTOS_ALBUM: Website
+          PHOTOS_CDN_URL: ${{ secrets.PHOTOS_CDN_URL }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_PREFIX: photos
+        run: npm run photos:sync
+
+      - name: Commit manifest changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/photos.json public/photos || true
+          if git diff --staged --quiet; then
+            echo "No photo changes"
+          else
+            git commit -m "chore(photos): sync album manifest"
+            git push
+          fi

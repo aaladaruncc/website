@@ -6,22 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "photos:seed": "node scripts/seed-demo-photos.mjs",
+    "photos:sync": "node scripts/sync-photos.mjs",
+    "photos:pull": "node scripts/sync-photos.mjs --pull",
+    "photos:sync:icloud": "node scripts/sync-photos.mjs --pull"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1095.0",
+    "@aws-sdk/lib-storage": "^3.1095.0",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
     "@vercel/analytics": "^1.5.0",
+    "exifr": "^7.1.3",
     "framer-motion": "^12.4.3",
     "lucide-react": "^0.474.0",
     "next": "15.1.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-type-animation": "^3.2.0",
+    "sharp": "^0.35.3",
     "three": "^0.163.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^20.19.43",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "9.39.2",
