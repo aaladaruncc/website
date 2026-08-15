@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react";
+import { AnalyticsGate } from "./analytics-gate";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={sourceSans.className}>
         {children}
-        <Analytics />
+        <AnalyticsGate />
       </body>
     </html>
   );

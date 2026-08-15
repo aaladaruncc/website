@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "lint:compliance": "eslint src/app/love-honestly src/app/analytics-gate.tsx src/app/layout.tsx",
+    "check:compliance": "node scripts/check-love-honestly-compliance.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
@@ -14,7 +16,7 @@
     "@vercel/analytics": "^1.5.0",
     "framer-motion": "^12.4.3",
     "lucide-react": "^0.474.0",
-    "next": "15.1.11",
+    "next": "^16.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-type-animation": "^3.2.0",
@@ -25,7 +27,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "9.39.2",
-    "eslint-config-next": "16.1.4",
+    "eslint-config-next": "^16.3.1",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
