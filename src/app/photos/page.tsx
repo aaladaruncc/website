@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PhotosGallery from "@/components/PhotosGallery";
-import { getPhotoDateRangeLabel, getPhotosManifest } from "@/lib/photos";
+import { getPhotosManifest } from "@/lib/photos";
 
 export const metadata: Metadata = {
   title: "Photos — Aryan Aladar",
@@ -12,8 +12,6 @@ export const dynamic = "force-dynamic";
 
 export default async function PhotosPage() {
   const manifest = await getPhotosManifest();
-  const photos = manifest.photos;
-  const rangeLabel = getPhotoDateRangeLabel(photos);
   const isDemo = manifest.source === "demo";
 
   return (
@@ -28,32 +26,10 @@ export default async function PhotosPage() {
               ← back to home
             </a>
           </p>
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Photos</h1>
-            <p className="text-base text-neutral-800">
-              {rangeLabel ??
-                (isDemo
-                  ? "Demo photos — connect your iCloud Shared Album to replace these."
-                  : "Add photos to your shared album to publish them here.")}
-            </p>
-            <p className="text-sm text-neutral-500">
-              {isDemo
-                ? "Showing local demo photos (no ICLOUD_SHARED_ALBUM_URL set yet)."
-                : `From iCloud Shared Album “${manifest.album}”`}
-              {manifest.updatedAt
-                ? ` · updated ${new Date(manifest.updatedAt).toLocaleString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}`
-                : null}
-            </p>
-          </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Photos</h1>
         </div>
 
-        <PhotosGallery photos={photos} isDemo={isDemo} />
+        <PhotosGallery photos={manifest.photos} isDemo={isDemo} />
       </section>
     </main>
   );
