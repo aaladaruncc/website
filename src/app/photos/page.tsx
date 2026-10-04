@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PhotosGallery from "@/components/PhotosGallery";
-import { getPhotosManifest } from "@/lib/photos";
+import { getPhotoDateRangeLabel, getPhotosManifest } from "@/lib/photos";
 
 export const metadata: Metadata = {
   title: "Photos — Aryan Aladar",
@@ -12,6 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default async function PhotosPage() {
   const manifest = await getPhotosManifest();
+  const photos = manifest.photos;
+  const rangeLabel = getPhotoDateRangeLabel(photos);
   const isDemo = manifest.source === "demo";
 
   return (
@@ -26,10 +28,15 @@ export default async function PhotosPage() {
               ← back to home
             </a>
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Photos</h1>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">Photos</h1>
+            {rangeLabel ? (
+              <p className="text-base text-neutral-800">{rangeLabel}</p>
+            ) : null}
+          </div>
         </div>
 
-        <PhotosGallery photos={manifest.photos} isDemo={isDemo} />
+        <PhotosGallery photos={photos} isDemo={isDemo} />
       </section>
     </main>
   );
