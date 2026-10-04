@@ -34,10 +34,6 @@ yarn-error.log*
 .env*
 !.env.example
 
-# photo sync working directories
-.photos-inbox/
-.photos-sync-state.json
-
 # vercel
 .vercel
 

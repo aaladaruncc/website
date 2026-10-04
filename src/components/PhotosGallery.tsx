@@ -4,6 +4,10 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { Photo } from "@/lib/photos";
 
+function isRemote(url: string) {
+  return url.startsWith("http://") || url.startsWith("https://");
+}
+
 function PhotoCard({
   photo,
   priority = false,
@@ -28,11 +32,12 @@ function PhotoCard({
     >
       <Image
         src={photo.imageUrl}
-        alt=""
+        alt={photo.caption || ""}
         width={photo.width}
         height={photo.height}
         priority={priority}
         sizes={sizes}
+        unoptimized={isRemote(photo.imageUrl)}
         className="h-auto w-full object-cover transition duration-300 group-hover:opacity-90"
       />
     </button>
@@ -47,7 +52,13 @@ function columnize(photos: Photo[], columnCount: number): Photo[][] {
   return columns;
 }
 
-export default function PhotosGallery({ photos }: { photos: Photo[] }) {
+export default function PhotosGallery({
+  photos,
+  isDemo = false,
+}: {
+  photos: Photo[];
+  isDemo?: boolean;
+}) {
   const [active, setActive] = useState<Photo | null>(null);
   const twoCol = useMemo(() => columnize(photos, 2), [photos]);
   const threeCol = useMemo(() => columnize(photos, 3), [photos]);
@@ -57,7 +68,6 @@ export default function PhotosGallery({ photos }: { photos: Photo[] }) {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setActive(null);
-      if (!active) return;
 
       const index = photos.findIndex((photo) => photo.id === active.id);
       if (event.key === "ArrowRight" && index < photos.length - 1) {
@@ -83,8 +93,9 @@ export default function PhotosGallery({ photos }: { photos: Photo[] }) {
       <div className="space-y-3 text-base text-neutral-700">
         <p>No photos yet.</p>
         <p>
-          Create an Apple Photos album named <span className="font-medium text-neutral-900">Website</span>,
-          add a few shots, then run the sync script. See{" "}
+          Create an iCloud <span className="font-medium text-neutral-900">Shared Album</span>, turn on{" "}
+          <span className="font-medium text-neutral-900">Public Website</span>, then set{" "}
+          <code className="text-sm">ICLOUD_SHARED_ALBUM_URL</code>. See{" "}
           <a
             className="underline underline-offset-4 decoration-neutral-300 transition hover:text-neutral-900 hover:decoration-neutral-700"
             href="https://github.com/aaladaruncc/website/blob/main/docs/PHOTOS_SETUP.md"
@@ -99,6 +110,13 @@ export default function PhotosGallery({ photos }: { photos: Photo[] }) {
 
   return (
     <>
+      {isDemo ? (
+        <p className="rounded-sm border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
+          Demo mode — add <code className="text-xs">ICLOUD_SHARED_ALBUM_URL</code> in{" "}
+          <code className="text-xs">.env.local</code> (or Vercel env) to load your Shared Album live.
+        </p>
+      ) : null}
+
       <div className="flex flex-col gap-3 sm:hidden">
         {photos.map((photo, index) => (
           <PhotoCard
@@ -164,12 +182,13 @@ export default function PhotosGallery({ photos }: { photos: Photo[] }) {
           >
             <Image
               src={active.imageUrl}
-              alt=""
+              alt={active.caption || ""}
               width={active.width}
               height={active.height}
               className="max-h-[90vh] w-auto object-contain"
               sizes="92vw"
               priority
+              unoptimized={isRemote(active.imageUrl)}
             />
             <p className="mt-3 text-center text-sm text-white/70">
               {new Date(active.date).toLocaleDateString("en-US", {

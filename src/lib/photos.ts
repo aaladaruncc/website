@@ -1,4 +1,5 @@
 import photosManifest from "@/data/photos.json";
+import { fetchSharedAlbum } from "@/lib/icloud-shared-album";
 
 export type Photo = {
   id: string;
@@ -6,20 +7,56 @@ export type Photo = {
   width: number;
   height: number;
   date: string;
+  caption?: string;
 };
 
 export type PhotosManifest = {
   album: string;
+  source: "icloud-shared-album" | "demo";
   updatedAt: string | null;
   photos: Photo[];
 };
 
-export function getPhotosManifest(): PhotosManifest {
-  return photosManifest as PhotosManifest;
+function getSharedAlbumUrl(): string | null {
+  const value =
+    process.env.ICLOUD_SHARED_ALBUM_URL?.trim() ||
+    process.env.NEXT_PUBLIC_ICLOUD_SHARED_ALBUM_URL?.trim();
+  return value || null;
 }
 
-export function getPhotos(): Photo[] {
-  return getPhotosManifest().photos;
+export function getDemoPhotosManifest(): PhotosManifest {
+  const demo = photosManifest as Omit<PhotosManifest, "source"> & { source?: string };
+  return {
+    album: demo.album || "Website (demo)",
+    source: "demo",
+    updatedAt: demo.updatedAt ?? null,
+    photos: demo.photos || [],
+  };
+}
+
+export async function getPhotosManifest(): Promise<PhotosManifest> {
+  const sharedUrl = getSharedAlbumUrl();
+
+  if (!sharedUrl) {
+    return getDemoPhotosManifest();
+  }
+
+  try {
+    const album = await fetchSharedAlbum(sharedUrl);
+    return {
+      album: album.albumName,
+      source: "icloud-shared-album",
+      updatedAt: new Date().toISOString(),
+      photos: album.photos,
+    };
+  } catch (error) {
+    console.error("Failed to load iCloud Shared Album; falling back to demo photos.", error);
+    return getDemoPhotosManifest();
+  }
+}
+
+export async function getPhotos(): Promise<Photo[]> {
+  return (await getPhotosManifest()).photos;
 }
 
 export function getPhotoDateRangeLabel(photos: Photo[]): string | null {
