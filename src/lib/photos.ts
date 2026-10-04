@@ -24,13 +24,19 @@ function getSharedAlbumUrl(): string | null {
   return value || null;
 }
 
+function sortNewestFirst(photos: Photo[]): Photo[] {
+  return photos
+    .slice()
+    .sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+}
+
 export function getDemoPhotosManifest(): PhotosManifest {
   const demo = photosManifest as Omit<PhotosManifest, "source"> & { source?: string };
   return {
     album: demo.album || "Website (demo)",
     source: "demo",
     updatedAt: demo.updatedAt ?? null,
-    photos: demo.photos || [],
+    photos: sortNewestFirst(demo.photos || []),
   };
 }
 
@@ -47,7 +53,7 @@ export async function getPhotosManifest(): Promise<PhotosManifest> {
       album: album.albumName,
       source: "icloud-shared-album",
       updatedAt: new Date().toISOString(),
-      photos: album.photos,
+      photos: sortNewestFirst(album.photos),
     };
   } catch (error) {
     console.error("Failed to load iCloud Shared Album; falling back to demo photos.", error);
